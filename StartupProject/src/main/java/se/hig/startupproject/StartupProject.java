@@ -11,6 +11,6 @@ package se.hig.startupproject;
 public class StartupProject {
 
     public static void main(String[] args) {
-        System.out.println("Hello Åke!");
+        System.out.println("Hello Åke!!");
     }
 }
