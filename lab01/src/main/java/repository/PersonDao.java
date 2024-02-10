@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import db.DbConnectionManager;
-import domain.LabPerson;
+import domain.Person;
 /**
  * DAO for the persistent handling of a Person object. It manages all
  * CRUD operations and conversion between the object world student and
@@ -21,79 +21,82 @@ import domain.LabPerson;
  * @author awi
  *
  */
-public class LabPersonDao implements Dao<LabPerson> {
-
+public class PersonDao implements Dao<Person> {
+        
 	DbConnectionManager dbConManagerSingleton = null;
 	
-	public LabPersonDao() {
+	public PersonDao() {
 		dbConManagerSingleton = DbConnectionManager.getInstance();
 	}
 	
 	@Override
-	public LabPerson get(int id) throws NoSuchElementException {
-		LabPerson student = null;
+	public Person get(int id) throws NoSuchElementException {
+		Person student = null;
 		try{
-			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, name, birth_year FROM persons WHERE id=" + id);
+			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, name, birth_year FROM labPersons WHERE id=" + id);
 			if( !resultSet.next())
 				throw new NoSuchElementException("The person with id " + id + " doesen't exist in database");
 			else
-				student = new LabPerson(resultSet.getInt(1), resultSet.getString(2), resultSet.getInt(3));
-			dbConManagerSingleton.close();
+				student = new Person(resultSet.getInt(1), resultSet.getString(2), resultSet.getInt(3));
+			
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}finally {
+            dbConManagerSingleton.close();
+        }
 		
 		return student;
 	}
 
 	@Override
-	public List<LabPerson> getAll() {
+	public List<Person> getAll() {
 		
-		ArrayList<LabPerson> list = new ArrayList<>();
+		ArrayList<Person> list = new ArrayList<>();
 		
 		try {
-			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, name, birth_year FROM persons");
+			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, name, birth_year FROM labPersons");
 			while (resultSet.next()) {
-				list.add(new LabPerson(resultSet.getInt(1), 
+				list.add(new Person(resultSet.getInt(1), 
 									 resultSet.getString(2).trim(),
 									 resultSet.getInt(3))
 						);
 				
 			}
-			dbConManagerSingleton.close();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-                dbConManagerSingleton.close();
+                finally {
+            dbConManagerSingleton.close();
+        }
 		return list;
 	}
 
 	@Override
-	public LabPerson save(LabPerson t) {
+	public Person save(Person t) {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
-		LabPerson savedPerson = null;
-		
+		Person savedPerson = null;
+
                 
 		try {
 			
 			
 			//*******This is the main 'save' operation ***************************
-			preparedStatement = dbConManagerSingleton.prepareStatement(
-											  "INSERT INTO persons (name, birth_year) VALUES (?, ?)");
+			preparedStatement = dbConManagerSingleton.prepareStatement("INSERT INTO labPersons (name, birth_year) VALUES (?, ?)", true);
 			preparedStatement.setString(1, t.getName());
 			preparedStatement.setInt(2, t.getBirthYear());
 			preparedStatement.execute();
                         
-                        preparedStatement = dbConManagerSingleton.prepareStatement("SELECT LAST_INSERT_ID()");
-                        preparedStatement.execute();
-                        
-                        resultSet = preparedStatement.getResultSet();
+                        //preparedStatement = dbConManagerSingleton.prepareStatement("SELECT LAST_INSERT_ID()");
+                        //preparedStatement.execute();
+                        //resultSet = preparedStatement.getResultSet();
+                        resultSet = preparedStatement.getGeneratedKeys();
 			resultSet.next();
                         int generatedId = resultSet.getInt(1);
-                        savedPerson = new LabPerson(generatedId, t.getName(), t.getBirthYear());
-                        dbConManagerSingleton.close();
+                        savedPerson = new Person(generatedId, t.getName(), t.getBirthYear());
+                        
 			// ********************************************************************
 			
 			
@@ -101,6 +104,9 @@ public class LabPersonDao implements Dao<LabPerson> {
 		catch ( SQLException e) {
 			e.printStackTrace();
 		}
+                finally {
+            dbConManagerSingleton.close();
+        }
 		return savedPerson;
 	}
 	/**
@@ -111,11 +117,11 @@ public class LabPersonDao implements Dao<LabPerson> {
      * @return 
 	 */
 	@Override
-	public LabPerson update(LabPerson t) {
+	public Person update(Person t) {
             
-            PreparedStatement sselectStatement = null;
+            //PreparedStatement sselectStatement = null;
             PreparedStatement preparedStatement = null;
-            LabPerson updatedPerson = null;
+            Person updatedPerson = null;
             
             try {
                 //sselectStatement = dbConManagerSingleton.prepareStatement("SELECT * FROM persons WHERE id =");
@@ -124,14 +130,14 @@ public class LabPersonDao implements Dao<LabPerson> {
                 
                // if(resultSet.next()) {
                 if(get(t.getId()) != null){
-                    preparedStatement = dbConManagerSingleton.prepareStatement("update persons set name=? ,birth_year=? where id=?");
+                    preparedStatement = dbConManagerSingleton.prepareStatement("update labPersons set name=? ,birth_year=? where id=?");
                     preparedStatement.setString(1,t.getName() );
                     preparedStatement.setInt(2, t.getBirthYear());
                     preparedStatement.setInt(3, t.getId());
                     preparedStatement.execute();
                     
-                    updatedPerson = new LabPerson(t.getId(), t.getName(), t.getBirthYear());
-                    dbConManagerSingleton.close();
+                    updatedPerson = new Person(t.getId(), t.getName(), t.getBirthYear());
+                    
                     return updatedPerson;
                 }
                 else {
@@ -144,14 +150,17 @@ public class LabPersonDao implements Dao<LabPerson> {
                 e.printStackTrace();
                 
             }
+            finally {
+            dbConManagerSingleton.close();
+        }
 	
             return t;
 	}
 
 	@Override
-	public LabPerson delete(LabPerson t) {
+	public Person delete(Person t) {
             
-                LabPerson deletedPerson = null;
+                Person deletedPerson = null;
 		int id = t.getId();
                 int rowCount = 0;
                 PreparedStatement preparedStatement = null;
@@ -159,26 +168,29 @@ public class LabPersonDao implements Dao<LabPerson> {
                 
                 try {
                     //****This is just for checking the 'delete' is a sucess. Count rows before delete***
-			resultSet = dbConManagerSingleton.excecuteQuery("SELECT COUNT(id) FROM persons");
+			resultSet = dbConManagerSingleton.excecuteQuery("SELECT COUNT(id) FROM labPersons");
 			resultSet.next();
 			rowCount = resultSet.getInt(1);
 			//System.out.println(rowCount); // Debug print
-                    preparedStatement = dbConManagerSingleton.prepareStatement("DELETE FROM persons where id="+id);
+                    preparedStatement = dbConManagerSingleton.prepareStatement("DELETE FROM labPersons where id="+id);
                    preparedStatement.execute();
                    
                    // **** Check nbr of rows after 'save'. Compare with previous row count *****
-			resultSet = dbConManagerSingleton.excecuteQuery("SELECT COUNT(id) FROM persons");
+			resultSet = dbConManagerSingleton.excecuteQuery("SELECT COUNT(id) FROM labPersons");
 			resultSet.next();
 			int newRowCount = resultSet.getInt(1);
 			if( newRowCount == (rowCount - 1)){ // Check if table is one more row after 'save'
 				deletedPerson = t;
                         }
 //			System.out.format("Previous row count: %d    Current row count: %d", rowCount, newRowCount);
-dbConManagerSingleton.close();
+
                 } 
                 catch (SQLException e) {
 			e.printStackTrace();
 		}
+                finally {
+            dbConManagerSingleton.close();
+        }
                 return deletedPerson;
 
 	}

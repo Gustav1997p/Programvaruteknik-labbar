@@ -8,17 +8,17 @@ package domain;
  *
  * @author Gustav
  */
-public class LabLocation {
+public class Site {
     
     private int id;
     private String city;
     
-    public LabLocation(int id, String city) {
+    public Site(int id, String city) {
         setId(id);
         setCity(city);
         
     }
-    public LabLocation(String city) {
+    public Site(String city) {
         setCity(city);
         
     }
@@ -27,7 +27,7 @@ public class LabLocation {
         this.id = id;
     }
 
-    private void setCity(String city) {
+    public void setCity(String city) {
         
         //Kollar om textsträngen är längre än 25 karaktärer vilket ej tillåts
         if(city.length() > 25) {
@@ -48,6 +48,10 @@ public class LabLocation {
 
     public String getCity() {
         return this.city;
+    }
+    @Override
+    public String toString() {
+        return "id: " + id + " city: "+ city;
     }
     
     

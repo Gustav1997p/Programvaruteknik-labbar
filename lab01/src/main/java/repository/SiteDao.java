@@ -5,7 +5,7 @@
 package repository;
 
 import db.DbConnectionManager;
-import domain.LabLocation;
+import domain.Site;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,22 +17,22 @@ import java.util.NoSuchElementException;
  *
  * @author Gustav
  */
-public class LabLocationDao implements Dao<LabLocation> {
+public class SiteDao implements Dao<Site> {
     
     DbConnectionManager dbConManagerSingleton = null;
     
-    public LabLocationDao() {
+    public SiteDao() {
         dbConManagerSingleton = DbConnectionManager.getInstance();
     }
 
     @Override
-    public LabLocation get(int id) throws NoSuchElementException {
-        LabLocation location = null;
+    public Site get(int id) throws NoSuchElementException {
+        Site location = null;
         try {
-            ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, city FROM locations WHERE id="+id);
+            ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, city FROM labLocations WHERE id="+id);
            // Om resultset.next() har någonting indikerar det att en location med det id finns
             if(resultSet.next()) {
-                location = new LabLocation(resultSet.getInt(1), resultSet.getString(2));
+                location = new Site(resultSet.getInt(1), resultSet.getString(2));
             }
             else {
                 throw new NoSuchElementException("The location with id " + id + " do not exist in the database");
@@ -42,69 +42,77 @@ public class LabLocationDao implements Dao<LabLocation> {
             e.printStackTrace();
             
         }
-        dbConManagerSingleton.close();
+        finally {
+            dbConManagerSingleton.close();
+        }
+        
         return location;
         
     }
 
     @Override
-    public List<LabLocation> getAll() {
-        ArrayList<LabLocation> listOfLocations = new ArrayList<>();
+    public List<Site> getAll() {
+        ArrayList<Site> listOfLocations = new ArrayList<>();
         try {
-			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, city FROM locations");
+			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, city FROM labLocations");
 			while (resultSet.next()) {
-				listOfLocations.add(new LabLocation(resultSet.getInt(1), resultSet.getString(2).trim())
+				listOfLocations.add(new Site(resultSet.getInt(1), resultSet.getString(2).trim())
 						);
 				
 			}
-			dbConManagerSingleton.close();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+        finally {
+            dbConManagerSingleton.close();
+        }
 		return listOfLocations;
     }
 
     @Override
-    public LabLocation save(LabLocation t) {
+    public Site save(Site t) {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        LabLocation savedLocation = null;
+        Site savedLocation = null;
+        String sql = "INSERT INTO labLocations (city) VALUES (?)";
         
         try {
-            preparedStatement = dbConManagerSingleton.prepareStatement("INSERT INTO locations (city) VALUES (?)");
+            preparedStatement = dbConManagerSingleton.prepareStatement(sql, true);
             preparedStatement.setString(1, t.getCity());
             preparedStatement.execute();
-            // Selectsats för att hämta det genererade ID
-            preparedStatement = dbConManagerSingleton.prepareStatement("Select LAST_INSERT_ID()");
-            preparedStatement.execute();
-            resultSet = preparedStatement.getResultSet();
+            
+            resultSet = preparedStatement.getGeneratedKeys();
             resultSet.next();
-            savedLocation = new LabLocation(resultSet.getInt(1), t.getCity());
-            dbConManagerSingleton.close();
+            savedLocation = new Site(resultSet.getInt(1), t.getCity());
+            
         }
-        catch ( SQLException e) {
+        catch ( SQLException e) {   
             e.printStackTrace();
+        }
+        finally {
+            dbConManagerSingleton.close();
         }
         return savedLocation;
         
   }
 
     @Override
-    public LabLocation update(LabLocation t) {
-        PreparedStatement selectStatement = null;
+    public Site update(Site t) {
+        
         PreparedStatement preparedStatement = null;
-        LabLocation updatedLocation = null;
+        Site updatedLocation = null;
         
         try {
             //Tittar om Id redan finns i databasen
             if(get(t.getId())!= null) {
-                preparedStatement = dbConManagerSingleton.prepareStatement("Update locations set city=? WHERE id=?");
+                preparedStatement = dbConManagerSingleton.prepareStatement("Update labLocations set city=? WHERE id=?");
                 preparedStatement.setString(1, t.getCity());
                 preparedStatement.setInt(2, t.getId());
                 preparedStatement.execute();
                 //Skapa nytt locationobjekt för att returnera
-                updatedLocation = new LabLocation(t.getId(), t.getCity());
-                dbConManagerSingleton.close();
+                updatedLocation = new Site(t.getId(), t.getCity());
+               
                 return updatedLocation;
                 
             }
@@ -115,12 +123,15 @@ public class LabLocationDao implements Dao<LabLocation> {
         catch (SQLException e) {
             e.printStackTrace();
         }
+        finally {
+            dbConManagerSingleton.close();
+        }
         return t;
   }
 
     @Override
-    public LabLocation delete(LabLocation t) {
-        LabLocation deletedLocation = null;
+    public Site delete(Site t) {
+        Site deletedLocation = null;
         int rowCount = 0;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -129,15 +140,15 @@ public class LabLocationDao implements Dao<LabLocation> {
              //Tittar om Id redan finns i databasen
             if(get(t.getId())!= null) {
             // Tittar antalet rader innan delete
-            resultSet = dbConManagerSingleton.excecuteQuery("Select COUNT(id) From locations");
+            resultSet = dbConManagerSingleton.excecuteQuery("Select COUNT(id) From labLocations");
             resultSet.next();
             rowCount = resultSet.getInt(1);
             
-            preparedStatement = dbConManagerSingleton.prepareStatement("DELETE FROM locations where id=?");
+            preparedStatement = dbConManagerSingleton.prepareStatement("DELETE FROM labLocations where id=?");
             preparedStatement.setInt(1, t.getId());
             preparedStatement.execute();
             // Tittar antalet rader efter delete
-            resultSet = dbConManagerSingleton.excecuteQuery("Select COUNT(id) FROM locations");
+            resultSet = dbConManagerSingleton.excecuteQuery("Select COUNT(id) FROM labLocations");
             resultSet.next();
             int newRowCounnt = resultSet.getInt(1);
             if( newRowCounnt ==(rowCount-1)) {
@@ -152,7 +163,10 @@ public class LabLocationDao implements Dao<LabLocation> {
         catch (SQLException e) {
             e.printStackTrace();
         }
-        dbConManagerSingleton.close();
+        finally {
+            dbConManagerSingleton.close();
+        }
+        
         return deletedLocation;
   }
     

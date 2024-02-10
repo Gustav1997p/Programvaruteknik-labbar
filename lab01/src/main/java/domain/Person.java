@@ -10,28 +10,29 @@ import java.time.Year;
  *
  * @author Gustav
  */
-public class LabPerson {
+public class Person {
     private int id;
     private String name;
     private int birthYear;
 
-    public LabPerson(int id, String name, int birthYear) {
+    public Person(int id, String name, int birthYear) {
         setId(id);
         setName(name);
         setBirthYear(birthYear);
     }
 
-    public LabPerson(String name, int birthYear) {
+    public Person(String name, int birthYear) {
         setName(name);
         setBirthYear(birthYear);
     }
     
     
-    private void setBirthYear(int birthYear) {
+    public void setBirthYear(int birthYear) {
         
         int length = (int) (Math.log10(birthYear)+1);
         int currentYear = Year.now().getValue();
-        int lowerLimitBirthYear = currentYear - 120;
+        int maxAge = 120;
+        int lowerLimitBirthYear = currentYear - maxAge;
         //Giltligt format, inte ett år som ej vart, rimlig ålder, du är inte 120 år gammal din sörk!
         if(length == 4 && currentYear > birthYear && lowerLimitBirthYear < birthYear){
             this.birthYear = birthYear;
@@ -43,14 +44,14 @@ public class LabPerson {
     }
     
     //Begränsad längd, bara bokstäver?
-    private void setName(String name) {
+    public void setName(String name) {
         
         //Kollar om textsträngen är längre än 25 karaktärer vilket ej är tillåtet
         if(name.length() > 25) {
             throw new IllegalArgumentException("Name cannot be longer than 25 characters");
         }
         //Regex för att titta tillåtna tecken + att strängen innehåller minst ett tecken
-        else if (name.matches("^[a-zA-ZåäöÅÄÖ]+")) {
+        else if (name.matches("^[a-zA-ZåäöÅÄÖ ]+")) {
             this.name = name;
         }
         else {
@@ -72,6 +73,9 @@ public class LabPerson {
 
     private void setId(int id) {
         this.id = id;
+    }
+    public String toString() {
+        return "id: " + id + " Name: "+ name + " birthyear: "+birthYear;
     }
     
    

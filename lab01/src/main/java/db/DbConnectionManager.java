@@ -102,6 +102,23 @@ public class DbConnectionManager {
 	public PreparedStatement prepareStatement(String statementString) throws SQLException {
 		return this.getConnection().prepareStatement(statementString);
 	}
+        /**
+         * PreparedStatement method with the ability to retrieve generated keys.
+         * 
+         * @param statementString
+         * @param retriveGeneratedKeys
+         * @return
+         * @throws SQLException 
+         * 
+         */
+        public PreparedStatement prepareStatement(String statementString, boolean retriveGeneratedKeys) throws SQLException {
+            if(retriveGeneratedKeys) {
+                return this.getConnection().prepareStatement(statementString, PreparedStatement.RETURN_GENERATED_KEYS);
+            } else {
+                return this.getConnection().prepareStatement(statementString);
+            }
+        }
+        
 	
 	public void close() {
 		try{
@@ -113,6 +130,8 @@ public class DbConnectionManager {
 			System.err.println(e.getMessage());
 		}
 	}
+
+    
 	
 	
 	
