@@ -7,7 +7,7 @@ package spike;
 import domain.Person;
 import java.util.List;
 import repository.PersonDao;
-import service.ServicePerson;
+import service.person.ServicePerson;
 
 /**
  *

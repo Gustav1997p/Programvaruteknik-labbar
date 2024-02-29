@@ -42,5 +42,5 @@
         <maven.compiler.target>18</maven.compiler.target>
         <exec.mainClass>se.hig.lab01.Lab01</exec.mainClass>
     </properties>
-    <name>lab02</name>
+    <name>Labbar</name>
 </project>
