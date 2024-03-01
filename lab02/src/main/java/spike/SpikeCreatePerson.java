@@ -19,8 +19,9 @@ public class SpikeCreatePerson {
         
         ServicePerson servicePerson = new ServicePerson();
         List<Person> personList = servicePerson.getAllPersons();
-        int birthyear = 2017;
-        String name = "Chester";
+        int birthyear = 1996;
+        String name = "Ole";
+         
         
         /**
          * Osäker om detta är hur det är menat att man ska spara en person med

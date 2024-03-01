@@ -6,6 +6,7 @@ package spike;
 
 import domain.Person;
 import java.util.List;
+import java.util.stream.Collectors;
 import service.person.FindAllPersonService;
 
 /**
@@ -17,10 +18,13 @@ public class SpikeFindAllPersonService {
     public static void main(String[] args) {
         
         List<Person> listOfPersons = new FindAllPersonService().execute();
-        for(Person p : listOfPersons) {
-            System.out.println(p.getName());
-            
-        }
+//        for(Person p : listOfPersons) {
+//            System.out.println(p.getName());
+//            
+//        }
+        var listOfNames = listOfPersons.stream().map(p -> p.getName()).collect(Collectors.joining("\n"));
+        System.out.println(listOfNames);
+        
     }
     
 }
