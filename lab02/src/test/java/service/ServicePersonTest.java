@@ -22,6 +22,7 @@ import repository.PersonDao;
 public class ServicePersonTest {
 
     Person personForTest;
+    Person personNoId;
 
     public ServicePersonTest() {
     }
@@ -37,6 +38,7 @@ public class ServicePersonTest {
     @BeforeEach
     public void setUp() {
         personForTest = new Person(1, "Kalle Karlsson", 2001);
+        
     }
 
     @AfterEach
@@ -50,6 +52,8 @@ public class ServicePersonTest {
     @Test
     public void testGetPerson() {
         System.out.println("getPerson");
+        
+        
         PersonDao personDaoMock = mock(PersonDao.class);
         // om get() anropas så returneras en Person
         when(personDaoMock.get(1)).thenReturn(new Person(1, "Kalle Karlsson", 2001));
@@ -101,13 +105,25 @@ public class ServicePersonTest {
     @Test
     public void testSavePerson() {
         System.out.println("savePerson");
-        Person personToSave = null;
-        ServicePerson instance = new ServicePerson();
-        Person expResult = null;
-        Person result = instance.savePerson(personToSave);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        personNoId = new Person("Kalle Karlsson", 2001);
+        // Skapa en mock
+        PersonDao personDaoMock = mock(PersonDao.class);
+        // om save() anropas så returneras en person
+        when(personDaoMock.save(personNoId)).thenReturn(new Person(1, "Kalle Karlsson", 2001));
+        // Injencera beroendet(av mockat objekt)
+        ServicePerson instance = new ServicePerson(personDaoMock);
+        
+        Person expResult = personForTest;
+        Person result = instance.savePerson(personNoId);
+        //Tester
+        verify(personDaoMock, times(1)).save(personNoId);
+        assertEquals(expResult.toString(), result.toString());
+        assertFalse(result.equals(personNoId));
+        
+//        System.out.println(expResult.toString());
+//        System.out.println(result.toString());
+        
+       
     }
 
     /**
@@ -116,13 +132,25 @@ public class ServicePersonTest {
     @Test
     public void testUpdatePerson() {
         System.out.println("updatePerson");
-        Person personToUpdate = null;
-        ServicePerson instance = new ServicePerson();
-        Person expResult = null;
-        Person result = instance.updatePerson(personToUpdate);
+        // Byta namn och födelseår på person att uppdatera
+        personForTest.setName("Janne Karlsson");
+        personForTest.setBirthYear(1988);
+        //Skapa en mock 
+        PersonDao personDaoMock = mock(PersonDao.class);
+        //Om update() anropas så returneras en Person
+        when(personDaoMock.update(personForTest)).thenReturn(new Person(1,"Janne Karlsson",1988));
+        // Injencera beroendet(av mockat objekt)
+        ServicePerson instance = new ServicePerson(personDaoMock);
+        
+        Person expResult = personForTest;
+        Person result = instance.updatePerson(personForTest);
+        
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        verify(personDaoMock, times(1)).update(personForTest);
+        
+//        System.out.println(expResult.toString());
+//        System.out.println(result.toString());
+        
     }
 
     /**
@@ -131,13 +159,21 @@ public class ServicePersonTest {
     @Test
     public void testDeletePerson() {
         System.out.println("deletePerson");
-        Person personToDelete = null;
-        ServicePerson instance = new ServicePerson();
-        Person expResult = null;
-        Person result = instance.deletePerson(personToDelete);
+        //Skapa en mock 
+        PersonDao personDaoMock = mock(PersonDao.class);
+        // Om delete() anropas så returnerar en person
+        when(personDaoMock.delete(personForTest)).thenReturn(new Person(1, "Kalle Karlsson", 2001));
+        // Injencera beroendet(av mockat objekt)
+        ServicePerson instance = new ServicePerson(personDaoMock);
+        
+        Person expResult = personForTest;
+        Person result = instance.deletePerson(personForTest);
+        
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        verify(personDaoMock, times(1)).delete(personForTest);
+        
+        
+        
     }
 
 }

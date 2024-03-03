@@ -4,11 +4,13 @@
  */
 package domain;
 
+import java.util.Objects;
+
 /**
  *
  * @author Gustav
  */
-public class Site {
+public class Site implements Comparable<Site> {
     
     private int id;
     private String city;
@@ -53,7 +55,21 @@ public class Site {
     public String toString() {
         return "id: " + id + " city: "+ city;
     }
-    
+    @Override
+    public int compareTo(Site o) {
+        return this.hashCode() - o.hashCode();
+    }
+    @Override
+    public boolean equals( Object p) {
+        return p instanceof Site && hashCode() == p.hashCode();
+    }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + this.id;
+        hash = 29 * hash + Objects.hashCode(this.city);
+        return hash;
+    }
     
     
 }
