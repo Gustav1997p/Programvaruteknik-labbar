@@ -5,7 +5,6 @@
 package service.person;
 
 import domain.Person;
-import java.util.List;
 import java.util.NoSuchElementException;
 import repository.PersonDao;
 import service.CleaningManagerServiceException;
@@ -13,29 +12,35 @@ import service.ServiceCommand;
 
 /**
  *
- * @author gurra
+ * @author Gustav
  */
-public class FindAllPersonService implements ServiceCommand<List<Person>> {
-    
+public class DeletePersonService implements ServiceCommand<Person> {
+
+    private Person personToDelete = null;
+
+    public DeletePersonService(Person person) {
+        this.personToDelete = person;
+
+    }
 
     @Override
-    public List<Person> execute() {
-        
-        List<Person> personList = null;
-
+    public Person execute() {
         try {
             PersonDao personDao = new PersonDao();
             db.DbConnectionManager.getInstance().open();
-            personList = personDao.getAll();
-            
+            personDao.delete(personToDelete);
+
         } catch (CleaningManagerServiceException e) {
-            e.printStackTrace();
-            
-        }
-        finally {
+            System.out.println(e.getMessage());
+
+        } catch (NoSuchElementException e) {
+            System.err.println(e.getMessage());
+
+        } finally {
             db.DbConnectionManager.getInstance().close();
+
         }
-        return personList;
+        return personToDelete;
     }
 
 }

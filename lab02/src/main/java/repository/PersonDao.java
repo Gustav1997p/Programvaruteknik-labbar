@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 
 import db.DbConnectionManager;
 import domain.Person;
+import service.CleaningManagerServiceException;
 /**
  * DAO for the persistent handling of a Person object. It manages all
  * CRUD operations and conversion between the object world student and
@@ -30,7 +31,7 @@ public class PersonDao implements Dao<Person> {
 	}
 	
 	@Override
-	public Person get(int id) throws NoSuchElementException {
+	public Person get(int id) throws NoSuchElementException, CleaningManagerServiceException {
 		Person student = null;
 		try{
 			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, name, birth_year FROM labPersons WHERE id=" + id);
@@ -41,21 +42,20 @@ public class PersonDao implements Dao<Person> {
 			
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-            dbConManagerSingleton.close();
-        }
+			throw new CleaningManagerServiceException(e.getMessage());
+		}
 		
 		return student;
 	}
 
 	@Override
-	public List<Person> getAll() {
+	public List<Person> getAll() throws CleaningManagerServiceException {
 		
 		ArrayList<Person> list = new ArrayList<>();
 		
 		try {
 			ResultSet resultSet = dbConManagerSingleton.excecuteQuery("SELECT id, name, birth_year FROM labPersons");
+                        
 			while (resultSet.next()) {
 				list.add(new Person(resultSet.getInt(1), 
 									 resultSet.getString(2).trim(),
@@ -65,24 +65,19 @@ public class PersonDao implements Dao<Person> {
 			}
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new CleaningManagerServiceException(e.getMessage());
 		}
-                finally {
-            dbConManagerSingleton.close();
-        }
+                
 		return list;
 	}
 
 	@Override
-	public Person save(Person t) {
+	public Person save(Person t) throws CleaningManagerServiceException {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		Person savedPerson = null;
-
                 
 		try {
-			
-			
 			//*******This is the main 'save' operation ***************************
 			preparedStatement = dbConManagerSingleton.prepareStatement("INSERT INTO labPersons (name, birth_year) VALUES (?, ?)", true);
 			preparedStatement.setString(1, t.getName());
@@ -102,11 +97,9 @@ public class PersonDao implements Dao<Person> {
 			
 		}
 		catch ( SQLException e) {
-			e.printStackTrace();
+			throw new CleaningManagerServiceException(e.getMessage());
 		}
-                finally {
-            dbConManagerSingleton.close();
-        }
+         
 		return savedPerson;
 	}
 	/**
@@ -158,10 +151,21 @@ public class PersonDao implements Dao<Person> {
 	}
 
 	@Override
-	public Person delete(Person t) {
+	public Person delete(Person t) throws CleaningManagerServiceException {
+            
             
                 Person deletedPerson = null;
+                /**
+                 * Här kollas om det är ett id som finns i databasen.
+                 * Finns det inget kastas NoSuchElementException från get() metoden.
+                 * Bandaid fix atm, kanske måste göra om hela metoden?
+                 * id=0 är standardvärde då id inte blivit tilldelad från AutoIncrement i databasen.
+                 */
+                
 		int id = t.getId();
+                if(id == 0) {
+                    throw new NoSuchElementException("This person do not exist in the database and can therefore not be deleted!");
+                }
                 int rowCount = 0;
                 PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -186,11 +190,9 @@ public class PersonDao implements Dao<Person> {
 
                 } 
                 catch (SQLException e) {
-			e.printStackTrace();
+			new CleaningManagerServiceException(e.getMessage());
 		}
-                finally {
-            dbConManagerSingleton.close();
-        }
+                
                 return deletedPerson;
 
 	}

@@ -136,7 +136,7 @@ public class DbConnectionManager {
             }
             if (connection != null) {
                 connection.close();
-                connection = null;
+                this.connection = null;
             }
             System.out.println("DB Connection closed");
         } catch (SQLException e) {
