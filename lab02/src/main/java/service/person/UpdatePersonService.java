@@ -14,25 +14,23 @@ import service.ServiceCommand;
  *
  * @author Gustav
  */
-public class DeletePersonService implements ServiceCommand<Person> {
+public class UpdatePersonService implements ServiceCommand<Person> {
 
-    private Person personToDelete = null;
+    Person personToUpdate = null;
 
-    public DeletePersonService(Person person) {
-        this.personToDelete = person;
-
+    public UpdatePersonService(Person person) {
+        this.personToUpdate = person;
     }
 
     @Override
     public Person execute() {
-        
         try {
             PersonDao personDao = new PersonDao();
             db.DbConnectionManager.getInstance().open();
-            personDao.delete(personToDelete);
+           personToUpdate = personDao.update(personToUpdate);
 
         } catch (CleaningManagerServiceException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
 
         } catch (NoSuchElementException e) {
             System.err.println(e.getMessage());
@@ -41,7 +39,7 @@ public class DeletePersonService implements ServiceCommand<Person> {
             db.DbConnectionManager.getInstance().close();
 
         }
-        return personToDelete;
+        return personToUpdate;
     }
 
 }

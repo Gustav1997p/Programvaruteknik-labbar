@@ -133,19 +133,13 @@ public class PersonDao implements Dao<Person> {
                     
                     return updatedPerson;
                 }
-                else {
-                    //Hantera om ID inte finns i databasen
-                    System.out.println("Person med id " + t.getId()+ " existerar inte");
-               
-                }
+                
                 
             }catch(SQLException e) {
-                e.printStackTrace();
+                throw new CleaningManagerServiceException(e.getMessage());
                 
             }
-            finally {
-            dbConManagerSingleton.close();
-        }
+            
 	
             return t;
 	}

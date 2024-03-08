@@ -2,11 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package service.person;
+package service.site;
 
-import domain.Person;
+import domain.Site;
 import java.util.NoSuchElementException;
-import repository.PersonDao;
+import repository.SiteDao;
 import service.CleaningManagerServiceException;
 import service.ServiceCommand;
 
@@ -14,34 +14,34 @@ import service.ServiceCommand;
  *
  * @author Gustav
  */
-public class DeletePersonService implements ServiceCommand<Person> {
+public class FindSiteByIdService implements ServiceCommand<Site> {
 
-    private Person personToDelete = null;
+    private int idSiteToFind;
+    private Site siteToReturn;
 
-    public DeletePersonService(Person person) {
-        this.personToDelete = person;
-
+    public FindSiteByIdService(int id) {
+        this.idSiteToFind = id;
     }
 
     @Override
-    public Person execute() {
-        
+    public Site execute() {
+
         try {
-            PersonDao personDao = new PersonDao();
+            SiteDao siteDao = new SiteDao();
             db.DbConnectionManager.getInstance().open();
-            personDao.delete(personToDelete);
+            siteToReturn = siteDao.get(idSiteToFind);
 
         } catch (CleaningManagerServiceException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
 
         } catch (NoSuchElementException e) {
             System.err.println(e.getMessage());
 
         } finally {
             db.DbConnectionManager.getInstance().close();
-
         }
-        return personToDelete;
+        return siteToReturn;
+
     }
 
 }

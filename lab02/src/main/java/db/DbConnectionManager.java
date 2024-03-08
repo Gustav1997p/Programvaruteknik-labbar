@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import service.CleaningManagerServiceException;
 
 /**
  * DbConnectionManager is a Singleton object that manages the connection to the
@@ -61,7 +62,7 @@ public class DbConnectionManager {
                 connection = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
                 System.out.println("Connected to the PostgreSQL server successfully.");
             } catch (SQLException e) {
-                System.out.println(e.getMessage());
+                throw new CleaningManagerServiceException("Could not establish connection to database");
             }
         }
 
@@ -140,8 +141,8 @@ public class DbConnectionManager {
             }
             System.out.println("DB Connection closed");
         } catch (SQLException e) {
-            System.err.println("Could not close the statement or the connection");
-            System.err.println(e.getMessage());
+           // System.err.println("Could not close the statement or the connection");
+            throw new CleaningManagerServiceException("Could not close the statement or the connection");
         }
     }
 
