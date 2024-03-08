@@ -10,7 +10,7 @@ import repository.PersonDao;
 
 /**
  *
- * @author Gustav
+ * @author gurra
  */
 public class ServicePerson {
     private final PersonDao personDao;
