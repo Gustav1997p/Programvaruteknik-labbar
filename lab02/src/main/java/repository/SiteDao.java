@@ -143,7 +143,7 @@ public class SiteDao implements Dao<Site> {
             }
 
         } catch (SQLException e) {
-            new CleaningManagerServiceException(e.getMessage());
+           throw new CleaningManagerServiceException(e.getMessage());
 
         }
 

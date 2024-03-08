@@ -187,7 +187,7 @@ public class PersonDao implements Dao<Person> {
 
                 } 
                 catch (SQLException e) {
-			new CleaningManagerServiceException(e.getMessage());
+			throw new CleaningManagerServiceException(e.getMessage());
 		}
                 
                 return deletedPerson;
