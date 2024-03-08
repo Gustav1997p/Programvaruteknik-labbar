@@ -28,7 +28,7 @@ public class FindAllSiteService implements ServiceCommand<List<Site>>{
             
         }
         catch (CleaningManagerServiceException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         finally {
             db.DbConnectionManager.getInstance().close();
