@@ -5,12 +5,13 @@
 package domain;
 
 import java.time.Year;
+import java.util.Objects;
 
 /**
  *
  * @author Gustav
  */
-public class Person {
+public class Person implements Comparable<Person>{
     private int id;
     private String name;
     private int birthYear;
@@ -76,6 +77,22 @@ public class Person {
     }
     public String toString() {
         return "id: " + id + " Name: "+ name + " birthyear: "+birthYear;
+    }
+    @Override
+    public int compareTo(Person o) {
+        return this.hashCode() - o.hashCode();
+    }
+    @Override
+    public boolean equals( Object p) {
+        return p instanceof Person && hashCode() == p.hashCode();
+    }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + this.id;
+        hash = 29 * hash + Objects.hashCode(this.name);
+        hash = 29 * hash + this.birthYear;
+        return hash;
     }
     
     

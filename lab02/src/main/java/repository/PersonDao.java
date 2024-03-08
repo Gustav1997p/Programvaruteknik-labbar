@@ -29,6 +29,9 @@ public class PersonDao implements Dao<Person> {
 	public PersonDao() {
 		dbConManagerSingleton = DbConnectionManager.getInstance();
 	}
+        public PersonDao(DbConnectionManager dbConnectionManager) {
+            dbConManagerSingleton = dbConnectionManager;
+        }
 	
 	@Override
 	public Person get(int id) throws NoSuchElementException, CleaningManagerServiceException {
