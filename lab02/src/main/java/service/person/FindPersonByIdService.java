@@ -6,7 +6,10 @@ package service.person;
 
 import domain.Person;
 import java.util.NoSuchElementException;
+import repository.Dao;
+import repository.DaoFactory;
 import repository.PersonDao;
+import service.BaseService;
 import service.CleaningManagerServiceException;
 import service.ServiceCommand;
 
@@ -14,10 +17,10 @@ import service.ServiceCommand;
  *
  * @author gurra
  */
-public class FindPersonByIdService implements ServiceCommand<Person> {
+public class FindPersonByIdService extends BaseService<Person> {
 
     private int idPersonToFind;
-    private Person personToReturn;
+    
 
     public FindPersonByIdService(int id) {
         this.idPersonToFind = id;
@@ -25,23 +28,9 @@ public class FindPersonByIdService implements ServiceCommand<Person> {
 
     @Override
     public Person execute() {
+        Dao<Person> dao = getFactory().get(DaoFactory.DaoFactoryType.PERSON);
+        return dao.get(idPersonToFind);
 
-        try {
-            PersonDao personDao = new PersonDao();
-            db.DbConnectionManager.getInstance().open();
-            personToReturn = personDao.get(idPersonToFind);
-
-        } catch (CleaningManagerServiceException e) {
-            e.printStackTrace();
-
-        } catch (NoSuchElementException e) {
-            System.out.println(e.getMessage());
-            
-        }
-        finally {
-            db.DbConnectionManager.getInstance().close();
-        }
-        return personToReturn;
 
     }
 

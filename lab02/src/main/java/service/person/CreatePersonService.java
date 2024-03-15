@@ -4,14 +4,17 @@
  */
 package service.person;
 
+import db.DbConnectionManager;
 import domain.Person;
+import repository.DaoFactory;
+import service.BaseService;
 import service.ServiceCommand;
 
 /**
  *
  * @author Gustav
  */
-public class CreatePersonService implements ServiceCommand<Person> {
+public class CreatePersonService extends BaseService<Person> {
     
     private String name;
     private int birthYear;
@@ -29,6 +32,8 @@ public class CreatePersonService implements ServiceCommand<Person> {
         return person;
         
     }
+
+    
     
     
 }

@@ -4,10 +4,15 @@
  */
 package service.person;
 
+import db.DbConnectionManager;
 import domain.Person;
 import java.util.List;
 import java.util.NoSuchElementException;
+import repository.Dao;
+import repository.DaoFactory;
+import repository.DaoFactory.DaoFactoryType;
 import repository.PersonDao;
+import service.BaseService;
 import service.CleaningManagerServiceException;
 import service.ServiceCommand;
 
@@ -15,27 +20,18 @@ import service.ServiceCommand;
  *
  * @author gurra
  */
-public class FindAllPersonService implements ServiceCommand<List<Person>> {
-    
+public class FindAllPersonService extends BaseService<List<Person>> {
 
     @Override
     public List<Person> execute() {
-        
-        List<Person> personList = null;
-
-        try {
-            PersonDao personDao = new PersonDao();
-            db.DbConnectionManager.getInstance().open();
-            personList = personDao.getAll();
-            
-        } catch (CleaningManagerServiceException e) {
-            e.printStackTrace();
-            
-        }
-        finally {
-            db.DbConnectionManager.getInstance().close();
-        }
-        return personList;
+        return super.getFactory().get(DaoFactoryType.PERSON).getAll();
     }
+
+//    @Override
+//    public List<Person> execute() {
+//        List<Person> personList = getFactory().get(DaoFactoryType.PERSON).getAll();
+//
+//        return personList;
+//    }
 
 }

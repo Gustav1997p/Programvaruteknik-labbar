@@ -6,7 +6,9 @@ package service.site;
 
 import domain.Site;
 import java.util.List;
+import repository.DaoFactory;
 import repository.SiteDao;
+import service.BaseService;
 import service.CleaningManagerServiceException;
 import service.ServiceCommand;
 
@@ -14,27 +16,15 @@ import service.ServiceCommand;
  *
  * @author Gustav
  */
-public class FindAllSiteService implements ServiceCommand<List<Site>>{
+public class FindAllSiteService extends BaseService<List<Site>>{
 
     @Override
     public List<Site> execute() {
-        
-        List<Site> siteList = null;
-        
-        try{
-            SiteDao siteDao = new SiteDao();
-            db.DbConnectionManager.getInstance().open();
-            siteList = siteDao.getAll();
-            
-        }
-        catch (CleaningManagerServiceException e) {
-            System.err.println(e.getMessage());
-        }
-        finally {
-            db.DbConnectionManager.getInstance().close();
-        }
+        List<Site> siteList = getFactory().get(DaoFactory.DaoFactoryType.SITE).getAll();
         return siteList;
     }
+
+    
     
     
 }

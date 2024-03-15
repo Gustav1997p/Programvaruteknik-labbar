@@ -6,7 +6,10 @@ package service.site;
 
 import domain.Site;
 import java.util.NoSuchElementException;
+import repository.Dao;
+import repository.DaoFactory;
 import repository.SiteDao;
+import service.BaseService;
 import service.CleaningManagerServiceException;
 import service.ServiceCommand;
 
@@ -14,7 +17,7 @@ import service.ServiceCommand;
  *
  * @author Gustav
  */
-public class DeleteSiteService implements ServiceCommand<Site> {
+public class DeleteSiteService extends BaseService<Site> {
 
     private Site siteToDelete = null;
 
@@ -24,21 +27,8 @@ public class DeleteSiteService implements ServiceCommand<Site> {
 
     @Override
     public Site execute() {
-        try {
-            SiteDao siteDao = new SiteDao();
-            db.DbConnectionManager.getInstance().open();
-            siteDao.delete(siteToDelete);
-
-        } catch (CleaningManagerServiceException e) {
-            System.err.println(e.getMessage());
-
-        } catch (NoSuchElementException e) {
-            System.err.println(e.getMessage());
-
-        } finally {
-            db.DbConnectionManager.getInstance().close();
-        }
-        return siteToDelete;
+        Dao<Site> dao = getFactory().get(DaoFactory.DaoFactoryType.SITE);
+        return dao.delete(siteToDelete);
     }
 
 }

@@ -5,7 +5,10 @@
 package service.person;
 
 import domain.Person;
+import repository.Dao;
+import repository.DaoFactory;
 import repository.PersonDao;
+import service.BaseService;
 import service.CleaningManagerServiceException;
 import service.ServiceCommand;
 
@@ -13,7 +16,7 @@ import service.ServiceCommand;
  *
  * @author gurra
  */
-public class SavePersonService implements ServiceCommand<Person> {
+public class SavePersonService extends BaseService<Person> {
     // attribut av Person-objekt som skall sparas
     private Person personToSave = null;
     
@@ -38,19 +41,8 @@ public class SavePersonService implements ServiceCommand<Person> {
 
     @Override
     public Person execute() {
-        
-        try {
-            PersonDao personDao = new PersonDao();
-            db.DbConnectionManager.getInstance().open();
-            personToSave = personDao.save(personToSave);
-        }
-        catch(CleaningManagerServiceException e) {
-            System.out.println(e.getMessage());
-            
-        }finally {
-            db.DbConnectionManager.getInstance().close();
-        }
-        return personToSave;
+      Dao<Person> dao = getFactory().get(DaoFactory.DaoFactoryType.PERSON);
+      return dao.save(personToSave);
     }
     
 }

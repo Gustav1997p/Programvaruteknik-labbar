@@ -4,13 +4,17 @@
  */
 package service;
 
+import db.DbConnectionManager;
+import repository.DaoFactory;
+
 /**
  *
  * @author gurra
  */
 public interface ServiceCommand<T> {
     
-    public T execute();
+    public void init(DaoFactory factory);
+    public <T> T execute();
     
     
 }

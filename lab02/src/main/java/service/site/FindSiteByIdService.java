@@ -6,7 +6,10 @@ package service.site;
 
 import domain.Site;
 import java.util.NoSuchElementException;
+import repository.Dao;
+import repository.DaoFactory;
 import repository.SiteDao;
+import service.BaseService;
 import service.CleaningManagerServiceException;
 import service.ServiceCommand;
 
@@ -14,10 +17,9 @@ import service.ServiceCommand;
  *
  * @author Gustav
  */
-public class FindSiteByIdService implements ServiceCommand<Site> {
+public class FindSiteByIdService extends BaseService<Site> {
 
     private int idSiteToFind;
-    private Site siteToReturn;
 
     public FindSiteByIdService(int id) {
         this.idSiteToFind = id;
@@ -25,22 +27,9 @@ public class FindSiteByIdService implements ServiceCommand<Site> {
 
     @Override
     public Site execute() {
+        Dao<Site> dao = super.getFactory().get(DaoFactory.DaoFactoryType.SITE);
+        return dao.get(idSiteToFind);
 
-        try {
-            SiteDao siteDao = new SiteDao();
-            db.DbConnectionManager.getInstance().open();
-            siteToReturn = siteDao.get(idSiteToFind);
-
-        } catch (CleaningManagerServiceException e) {
-            System.err.println(e.getMessage());
-
-        } catch (NoSuchElementException e) {
-            System.err.println(e.getMessage());
-
-        } finally {
-            db.DbConnectionManager.getInstance().close();
-        }
-        return siteToReturn;
 
     }
 

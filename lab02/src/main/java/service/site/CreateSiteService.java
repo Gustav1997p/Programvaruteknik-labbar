@@ -5,13 +5,14 @@
 package service.site;
 
 import domain.Site;
+import service.BaseService;
 import service.ServiceCommand;
 
 /**
  *
  * @author Gustav
  */
-public class CreateSiteService implements ServiceCommand<Site>{
+public class CreateSiteService extends BaseService<Site>{
     
     private String name;
     
